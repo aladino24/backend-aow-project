@@ -1,0 +1,70 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model UserAccount {
+  id                      Int      @id @default(autoincrement())
+  nameId                  String   @unique
+  fraksi                  String
+  rankAccount             String
+  jumlahSkillCard         Int
+  jumlahUpgrade           Int
+  keterangan              String?
+  namaPemilikAccount      String
+  noWa                    String
+  status                  String
+  namaKlan                String
+  penghargaan             String?
+  peringkatPemainUmum     Int
+  peringkatPemainTurnamen Int
+  peringkatPemainSkirmish Int
+  peringkatPemainPrestasi Int
+  password                String
+  rooms                   Room[]   @relation("UserRooms")
+
+  Participant Participant[]
+}
+
+model MapPerang {
+  noMap     Int      @id @default(autoincrement())
+  namaMap   String
+  gambar    String
+  rooms     Room[]   @relation("MapRooms")
+}
+
+model Room {
+  id              Int          @id @default(autoincrement())
+  tipePerang      TipePerang
+  mapPerangId     Int
+  mapPerang       MapPerang    @relation("MapRooms", fields: [mapPerangId], references: [noMap])
+  rulePerang      String
+  createdBy       Int
+  creator         UserAccount  @relation("UserRooms", fields: [createdBy], references: [id])
+  participants    Participant[]
+  broadcastMessage String
+}
+
+model Participant {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  user      UserAccount  @relation(fields: [userId], references: [id])
+  roomId    Int
+  room      Room         @relation(fields: [roomId], references: [id])
+}
+
+enum TipePerang {
+  KONFRONTASI
+  DOMINASI
+  MANUVER
+  DUA_VS_DUA
+  TIGA_VS_TIGA
+  FFA3
+  FFA4
+  FFA5
+  FFA6
+}
